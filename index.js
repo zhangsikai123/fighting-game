@@ -73,6 +73,7 @@ kenjiSprites = {
 background = new Sprite({
   position: {x: 0, y: 0},
   imageSrc: './img/background.png',
+
 });
 
 shop = new Sprite({
@@ -82,18 +83,6 @@ shop = new Sprite({
   frameMax: 6,
 });
 
-
-background = new Sprite({
-  position: {x: 0, y: 0},
-  imageSrc: './img/background.png',
-});
-
-shop = new Sprite({
-  position: {x: 650, y: 290},
-  imageSrc: './img/shop.png',
-  scale: 1.5,
-  frameMax: 6,
-});
 
 player = new Fighter({
   position: {x: 0, y: 0},
@@ -205,14 +194,16 @@ function animate() {
     }
   }
 
-  if (player.hits(enemy)) {
+  if (player.alive && player.hits(enemy)) {
     enemy.HP -= 20;
     enemy.switchMovement('injured');
-    document.querySelector('#enemyHP').style.width = enemy.HP + '%';
+    gsap.to('#enemyHP', {
+      width: enemy.HP + '%',
+    });
     console.log('player scored');
   }
 
-  if (enemy.HP <= 0 ) {
+  if ( enemy.HP <= 0 ) {
     enemy.switchMovement('dead');
     enemy.alive = false;
     if (enemy.currentFrame >= enemy.frameMax - 1) {
@@ -220,10 +211,12 @@ function animate() {
     }
   }
 
-  if (enemy.hits(player)) {
+  if (enemy.alive && enemy.hits(player)) {
     player.HP -= 20;
     player.switchMovement('injured');
-    document.querySelector('#playerHP').style.width = player.HP + '%';
+    gsap.to('#playerHP', {
+      width: player.HP + '%',
+    });
     console.log('enemy scored');
   }
 
@@ -235,13 +228,13 @@ function animate() {
     }
   }
 
-
   if (isGameover()) {
     determineWinner();
   }
 
   background.update();
   shop.update();
+
   enemy.update();
   player.update();
 

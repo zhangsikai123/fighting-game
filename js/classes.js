@@ -96,9 +96,6 @@ class Fighter extends Sprite {
   }
 
   hits(enemy) {
-    if (!this.alive) {
-      return false;
-    }
     const cropWidth = enemy.image.width / enemy.frameMax;
     const enemyCrop = {
       position: {
