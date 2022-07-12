@@ -7,7 +7,10 @@ gravity = 1;
 speed = 5;
 jumpspeed = 20;
 time = 60;
-
+function play() {
+  var audio = new Audio('https://interactive-examples.mdn.mozilla.net/media/examples/t-rex-roar.mp3');
+  audio.play();
+}
 playerSprites = {
   'idle': {
     'imageSrc': './img/samuraiMack/Idle.png',
@@ -206,6 +209,7 @@ function animate() {
   if ( enemy.HP <= 0 ) {
     enemy.switchMovement('dead');
     enemy.alive = false;
+    enemy.velocity.x = 0;
     if (enemy.currentFrame >= enemy.frameMax - 1) {
       enemy.stopAnimate = true;
     }
@@ -223,6 +227,7 @@ function animate() {
   if (player.HP <= 0 ) {
     player.switchMovement('dead');
     player.alive = false;
+    player.velocity.x = 0;
     if (player.currentFrame >= player.frameMax - 1) {
       player.stopAnimate = true;
     }
