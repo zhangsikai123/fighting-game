@@ -7,12 +7,15 @@ gravity = 1;
 speed = 5;
 jumpspeed = 20;
 time = 60;
+signal = 'stop';
 socket = io();
+p = new Player(socket);
 
 function play() {
-  const audio = new Audio('https://interactive-examples.mdn.mozilla.net/media/examples/t-rex-roar.mp3');
+  var audio = new Audio('./sounds/funny-day.mp3');
   audio.play();
 }
+
 playerSprites = {
   'idle': {
     'imageSrc': './img/samuraiMack/Idle.png',
@@ -117,7 +120,7 @@ enemy = new Fighter({
     attackStartFrame: 1,
     width: 130,
     height: 50,
-  }});
+}});
 
 const keys = {
   Enter: {pressed: false},
@@ -134,7 +137,7 @@ const keys = {
 
 function timer() {
   setTimeout(timer, 1000);
-  if (time > 0 ) {
+  if (signal == 'start' && time > 0 ) {
     time --;
   }
   document.querySelector('#timer').innerHTML = time;
@@ -157,7 +160,7 @@ function determineWinner() {
 
 function animate() {
   c.clearRect(0, 0, canvas.width, canvas.height);
-  if (player.alive) {
+  if (player.active && player.alive) {
     if (keys.d.pressed && player.lastKey == 'd') {
       player.velocity.x = speed;
       player.switchMovement('run');
@@ -177,7 +180,7 @@ function animate() {
     }
   }
 
-  if (enemy.alive) {
+  if (enemy.active && enemy.alive) {
     if (keys.ArrowRight.pressed && enemy.lastKey == 'ArrowRight') {
       enemy.velocity.x = speed;
       enemy.switchMovement('run');
@@ -248,55 +251,15 @@ function animate() {
 timer();
 animate();
 
-window.addEventListener('keydown', (e)=>{
-  console.log(e.key);
-  switch (e.key) {
-    case 'f':
-      player.attack();
-      player.switchMovement('attack');
-      break;
-    case 'Enter':
-      enemy.attack();
-      enemy.switchMovement('attack');
-      break;
-    case 'a':
-      player.lastKey = 'a';
-      keys.a.pressed = true;
-      break;
-    case 'd':
-      player.lastKey = 'd';
-      keys.d.pressed = true;
-      break;
-    case 'w':
-      player.lastKey = 'w';
-      keys.w.pressed = true;
-      break;
-    case 's':
-      player.lastKey = 's';
-      keys.s.pressed = true;
-      break;
-
-    case 'ArrowLeft':
-      enemy.lastKey = 'ArrowLeft';
-      keys.ArrowLeft.pressed = true;
-      break;
-    case 'ArrowRight':
-      enemy.lastKey = 'ArrowRight';
-      keys.ArrowRight.pressed = true;
-      break;
-    case 'ArrowUp':
-      enemy.lastKey = 'ArrowUp';
-      keys.ArrowUp.pressed = true;
-      break;
-    case 'ArrowDown':
-      enemy.lastKey = 'ArrowDown';
-      keys.ArrowDown.pressed = true;
-      break;
+socket.on('signal', function(e){
+  if(e == 'start'){
+    player.activate();
+    enemy.activate();
+    signal = 'start';
   }
 });
 
-
-window.addEventListener('keyup', (e)=>{
+socket.on('keyUp', function(e){
   switch (e.key) {
     case 'f':
       keys.f.pressed = false;
@@ -329,4 +292,56 @@ window.addEventListener('keyup', (e)=>{
       keys.ArrowDown.pressed = false;
       break;
   }
+});
+socket.on('keyDown', function(e){
+  switch (e.key) {
+  case 'f':
+    player.attack();
+    player.switchMovement('attack');
+    break;
+  case 'Enter':
+    enemy.attack();
+    enemy.switchMovement('attack');
+    break;
+  case 'a':
+    player.lastKey = 'a';
+    keys.a.pressed = true;
+    break;
+  case 'd':
+    player.lastKey = 'd';
+    keys.d.pressed = true;
+    break;
+  case 'w':
+    player.lastKey = 'w';
+    keys.w.pressed = true;
+    break;
+  case 's':
+    player.lastKey = 's';
+    keys.s.pressed = true;
+    break;
+  case 'ArrowLeft':
+    enemy.lastKey = 'ArrowLeft';
+    keys.ArrowLeft.pressed = true;
+    break;
+  case 'ArrowRight':
+    enemy.lastKey = 'ArrowRight';
+    keys.ArrowRight.pressed = true;
+    break;
+  case 'ArrowUp':
+    enemy.lastKey = 'ArrowUp';
+    keys.ArrowUp.pressed = true;
+    break;
+  case 'ArrowDown':
+    enemy.lastKey = 'ArrowDown';
+    keys.ArrowDown.pressed = true;
+    break;
+  }
+});
+
+window.addEventListener('keydown', (e)=>{
+  p.keyDown(e.key);
+});
+
+window.addEventListener('keyup', (e)=>{
+  p.keyUp(e.key);
 });
